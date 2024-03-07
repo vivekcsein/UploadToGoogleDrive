@@ -1,8 +1,8 @@
 "use client";
-import React, { useCallback, useState } from "react";
-import Image from "next/image";
+import React, { useCallback, useRef, useState } from "react";
 import ButtonUpload from "../button/ButtonUpload";
-import ButtonBack from "../button/ButtonBack";
+// import ButtonBack from "../button/ButtonBack";
+import ScreenShotImage from "./ScreenShotImage";
 
 type ScreenShotUploadDisplayProps = {
   url: string;
@@ -15,11 +15,27 @@ const ScreenShotUploadDisplay = ({
   //upload image to google drive
   const uploadToDrive = useCallback(async () => {
     console.log("upload to drive");
+    try {
+      const img = new Image();
+      img.src = url;
+      const data = new FormData();
+      const blob = new Blob([url], { type: "image/png" });
+      data.append("image", blob);
+      const response = await fetch("/api/upload", {
+        method: "POST",
+        body: data,
+      });
+      if (!response.ok) throw new Error("Faild to Upload Image");
+      const result = await response.json();
+      console.log(result);
+    } catch (error) {
+      console.error(error);
+    }
   }, []);
 
-  const backToScreenDisplay = useCallback(() => {
-    setImage("");
-  }, []);
+  // const backToScreenDisplay = useCallback(() => {
+  //   setImage("");
+  // }, []);
 
   return (
     <div>
@@ -30,12 +46,7 @@ const ScreenShotUploadDisplay = ({
           </div> */}
           <div className="w-full h-2/3 flex justify-center items-center">
             <div className="w-2/3 h-2/3">
-              <Image
-                alt="screenshot"
-                src={url}
-                height={1080}
-                width={1920}
-              ></Image>
+              <ScreenShotImage url={url} />
             </div>
           </div>
           <div className="flex gap-4">
